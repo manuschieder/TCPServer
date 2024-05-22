@@ -8,35 +8,47 @@ public class Main {
 
     public static void main(String[] args) {
         try {
-            // Startet den Server auf Port 54321
+            // starting server on port 54321
             ServerSocket serverSocket = new ServerSocket(54321);
             System.out.println("Server started on port 54321...");
 
             while (true) {
-                // Wartet auf eine Verbindung vom Client
                 Socket clientSocket = serverSocket.accept();
                 System.out.println("Connection from " + clientSocket.getInetAddress());
 
-                // Liest die Anfrage vom Client
-                BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-                String request = in.readLine();
+                PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+                BufferedInputStream bis = new BufferedInputStream(clientSocket.getInputStream());
+
+                // check available bytes
+                int availableBytes = bis.available();
+                byte[] buffer = new byte[availableBytes];
+                
+                // read the exact number of available bytes
+                bis.read(buffer, 0, availableBytes);
+
+                String request = new String(buffer);
                 System.out.println("Received: " + request);
 
-                // Überprüft die Anfrage und sendet die entsprechende Antwort
-                String response = "";
+                // checks requests and sends the right response
+                String response;
                 if ("version".equalsIgnoreCase(request)) {
                     response = "Serial Server Submission System 2.0";
-                } else if (request.startsWith("serial=")) {
-                    response = validateSerial(request.substring(7)); // Extrahiert den Teil nach "serial="
+                    out.println(response);
+                    System.out.println("Received2: " + request);
+                    System.out.println(response);
+                    response = validateSerial(request.substring(7)); // extracts part after "serial="
+                    System.out.println(response);
+                    out.println(response);
+                    
+                    serverSocket.close();
                 } else {
                     response = "UNKNOWN COMMAND";
                 }
 
-                // Sendet die Antwort zurück
-                PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+                // Sends response
                 out.println(response);
 
-                // Schließt die Verbindung
+                // Closes connection
                 clientSocket.close();
             }
         } catch (IOException e) {
