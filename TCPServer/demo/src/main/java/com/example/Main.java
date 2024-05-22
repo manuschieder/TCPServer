@@ -6,7 +6,7 @@ import java.net.*;
 
 public class Main {
 
-    public static void main(String[] args) {
+   public static void main(String[] args) {
         try {
             // starting server on port 54321
             ServerSocket serverSocket = new ServerSocket(54321);
@@ -57,6 +57,6 @@ public class Main {
     }
 
     private static String validateSerial(String serial) {
-        return "SERIAL VALID=1";
+        return "SERIAL_VALID=1";
     }
 }
